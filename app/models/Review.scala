@@ -309,19 +309,15 @@ object Review {
       client.smembers(s"Proposals:Reviewed:ByAuthor:$reviewerUUID").flatMap {
         proposalId: String =>
           val score = Option(client.zscore(s"Proposals:Votes:$proposalId", reviewerUUID))
-          score match {
-            case None => None
-            case Some(_) =>
-              val state = Proposal.findProposalState(proposalId)
-              state.flatMap {
-                case ProposalState.DRAFT => None
-                case ProposalState.DECLINED => None
-                case ProposalState.DELETED => None
-                case ProposalState.REJECTED => None
-                case ProposalState.ARCHIVED => None
-                case ProposalState.UNKNOWN => None
-                case _ => Option((proposalId, score.map(_.toDouble).get))
-              }
+          val state = Proposal.findProposalState(proposalId)
+          state.flatMap {
+            case ProposalState.DRAFT => None
+            case ProposalState.DECLINED => None
+            case ProposalState.DELETED => None
+            case ProposalState.REJECTED => None
+            case ProposalState.ARCHIVED => None
+            case ProposalState.UNKNOWN => None
+            case _ => Option((proposalId, score.map(_.toDouble).getOrElse(0)))
           }
       }
   }
