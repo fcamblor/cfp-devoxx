@@ -304,23 +304,13 @@ object Review {
     proposalsCommentsCount
   }
 
-  def allVotesFromUser(reviewerUUID: String): Set[(String, Option[Double])] = Redis.pool.withClient {
+  def allVotesFromUser(reviewerUUID: String): Set[(String, Double)] = Redis.pool.withClient {
     implicit client =>
       client.smembers(s"Proposals:Reviewed:ByAuthor:$reviewerUUID").flatMap {
         proposalId: String =>
           val score = Option(client.zscore(s"Proposals:Votes:$proposalId", reviewerUUID))
           score match {
-            case None =>
-              val state = Proposal.findProposalState(proposalId)
-              state.flatMap {
-                case ProposalState.DRAFT => None
-                case ProposalState.DECLINED => None
-                case ProposalState.DELETED => None
-                case ProposalState.REJECTED => None
-                case ProposalState.ARCHIVED => None
-                case ProposalState.UNKNOWN => None
-                case _ => Option((proposalId, None))
-              }
+            case None => None
             case Some(_) =>
               val state = Proposal.findProposalState(proposalId)
               state.flatMap {
@@ -330,8 +320,7 @@ object Review {
                 case ProposalState.REJECTED => None
                 case ProposalState.ARCHIVED => None
                 case ProposalState.UNKNOWN => None
-                case _ =>
-                  Option((proposalId, score.map(_.toDouble)))
+                case _ => Option((proposalId, score.map(_.toDouble).get))
               }
           }
       }
