@@ -60,7 +60,7 @@ case class ProposalConfiguration(id: String, slotsCount: Int,
 object ProposalConfiguration {
 
   val UNKNOWN = ProposalConfiguration(id = "unknown", slotsCount = 0, givesSpeakerFreeEntrance = false, freeEntranceDisplayed = false,
-    htmlClass = "", hiddenInCombo = true, chosablePreferredDay = false)
+    htmlClass = "", hiddenInCombo = true, chosablePreferredDay = false, accessibleTypeToGoldenTicketReviews = () => false)
 
   def parse(propConf: String): ProposalConfiguration = {
     ConferenceDescriptor.ConferenceProposalConfigurations.ALL.find(p => p.id == propConf).getOrElse(ProposalConfiguration.UNKNOWN)
