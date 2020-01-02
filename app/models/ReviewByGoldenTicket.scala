@@ -107,7 +107,7 @@ object ReviewByGoldenTicket {
     return ReviewByGoldenTicket.allProposalsNotReviewed(reviewerUUID)
       .filter(p =>
         !p.sponsorTalk
-          && ConferenceDescriptor.ConferenceProposalConfigurations.accessibleTypeToGoldenTicketReviews(p.talkType)
+          && ProposalConfiguration.accessibleTypeToGoldenTicketReviews(p.talkType)
       )
   }
 

@@ -29,14 +29,14 @@
         <p>Cette offre n'est valable que pour les Quickies, pour 2 jours et n'est pas cessible à une autre personne.</p>
     }
 
-    @if(!ConferenceDescriptor.ConferenceProposalConfigurations.doesItGivesSpeakerFreeEntrance(proposal.talkType) && proposal.talkType.id!="quick") {
+    @if(!ProposalConfiguration.doesItGivesSpeakerFreeEntrance(proposal.talkType) && proposal.talkType.id!="quick") {
     <p><strong>Attention</strong>, ce format de présentation à @Messages("longYearlyName") ne donne <strong>pas de badge speaker</strong>. Vous devez
         acheter une place à la conférence pour participer, si vous ne disposez pas, par ailleurs, d'un ticket.</P>
      <p>La conférence étant complète, vous pouvez encore vous inscrire via le lien suivant unique (et lié à votre soumission de sujet) :
      <a href="https://reg.devoxx.fr/speakers/welcome/@proposal.id/@email">https://reg.devoxx.fr/speakers/welcome/@proposal.id/@email</a>
      </p>
     }
-    @if(ConferenceDescriptor.ConferenceProposalConfigurations.doesItGivesSpeakerFreeEntrance(proposal.talkType)){
+    @if(ProposalConfiguration.doesItGivesSpeakerFreeEntrance(proposal.talkType)){
         <p>Ce type de présentation donne droit à un badge speaker, et vous permettra d'accéder à l'ensemble de la conférence, ainsi qu'au diner des speakers.</p>
         <p>Vous n'avez pas à vous inscrire, votre badge Speaker sera préparé pour vous à l'entrée de la conférence. Ce badge est valable pour les 3 jours de la conférence.</p>
         <p>Le diner speaker aura lieu le mercredi soir dans le centre de Paris. Nous vous tiendrons informé par email.</p>
@@ -60,7 +60,7 @@
     <p>We will send you by mail an unique registration code. Please use this code on https://reg.devoxx.fr and configure your badge before the conference.</p>
     }
 
-    @if(!ConferenceDescriptor.ConferenceProposalConfigurations.doesItGivesSpeakerFreeEntrance(proposal.talkType) && proposal.talkType.id!="quick") {
+    @if(!ProposalConfiguration.doesItGivesSpeakerFreeEntrance(proposal.talkType) && proposal.talkType.id!="quick") {
     <p>This type of talk does not grant a conference pass, so you will need to register as an attendee in order to access the conference area.
     Registration details <a href="https://reg.devoxx.fr/speakers/welcome/@proposal.id/@email">register Devoxx FR 2019</a></p>
 } else {

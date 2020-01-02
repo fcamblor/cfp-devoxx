@@ -2,6 +2,7 @@ package models
 
 import java.util.Locale
 
+import models.ConferenceDescriptor.{ConferenceProposalTypes, ConferenceSlots}
 import org.apache.commons.lang3.RandomStringUtils
 import org.joda.time.{DateTime, DateTimeZone, Period}
 import play.api.Play
@@ -61,35 +62,61 @@ object ProposalConfiguration {
 
   val UNKNOWN = ProposalConfiguration(id = "unknown", slotsCount = 0, givesSpeakerFreeEntrance = false, freeEntranceDisplayed = false,
     htmlClass = "", hiddenInCombo = true, chosablePreferredDay = false, accessibleTypeToGoldenTicketReviews = () => false)
+  val CONF = ProposalConfiguration(id = "conf", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.CONF.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-bullhorn",
+    chosablePreferredDay = true, accessibleTypeToGoldenTicketReviews = () => true)
+  val UNI = ProposalConfiguration(id = "uni", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.UNI.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-laptop",
+    chosablePreferredDay = false, accessibleTypeToGoldenTicketReviews = () => true)
+  val TIA = ProposalConfiguration(id = "tia", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.TIA.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-tools",
+    chosablePreferredDay = true, accessibleTypeToGoldenTicketReviews = () => true)
+  val LAB = ProposalConfiguration(id = "lab", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.LAB.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-flask",
+    chosablePreferredDay = true, accessibleTypeToGoldenTicketReviews = () => true)
+  val QUICK = ProposalConfiguration(id = "quick", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.QUICK.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-fast-forward",
+    chosablePreferredDay = true, allowOtherSpeaker = false, accessibleTypeToGoldenTicketReviews = () => true)
+  val BOF = ProposalConfiguration(id = "bof", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.BOF.id)), givesSpeakerFreeEntrance = false, freeEntranceDisplayed = false, htmlClass = "fas fa-users",
+    chosablePreferredDay = false, accessibleTypeToGoldenTicketReviews = () => ConferenceDescriptor.isCFPOpen)
+  val KEY = ProposalConfiguration(id = "key", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.KEY.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = false, htmlClass = "fas fa-microphone",
+    chosablePreferredDay = true, accessibleTypeToGoldenTicketReviews = () => false)
+  val OTHER = ProposalConfiguration(id = "other", slotsCount = 1, givesSpeakerFreeEntrance = false, freeEntranceDisplayed = false, htmlClass = "fas fa-microphone-alt",
+    hiddenInCombo = true, chosablePreferredDay = false, accessibleTypeToGoldenTicketReviews = () => false)
+
+  val ALL = List(CONF, UNI, TIA, LAB, QUICK, BOF, KEY, OTHER)
 
   def parse(propConf: String): ProposalConfiguration = {
-    ConferenceDescriptor.ConferenceProposalConfigurations.ALL.find(p => p.id == propConf).getOrElse(ProposalConfiguration.UNKNOWN)
+    ProposalConfiguration.ALL.find(p => p.id == propConf).getOrElse(ProposalConfiguration.UNKNOWN)
   }
 
-  def totalSlotsCount: Int = ConferenceDescriptor.ConferenceProposalConfigurations.ALL.map(_.slotsCount).sum
+  def totalSlotsCount: Int = ProposalConfiguration.ALL.map(_.slotsCount).sum
 
   def isDisplayedFreeEntranceProposals(pt: ProposalType): Boolean = {
-    ConferenceDescriptor.ConferenceProposalConfigurations.ALL.filter(p => p.id == pt.id).map(_.freeEntranceDisplayed).headOption.getOrElse(false)
+    ProposalConfiguration.ALL.filter(p => p.id == pt.id).map(_.freeEntranceDisplayed).headOption.getOrElse(false)
   }
 
   def getProposalsImplyingATrackSelection: List[ProposalConfiguration] = {
-    ConferenceDescriptor.ConferenceProposalConfigurations.ALL.filter(p => p.impliedSelectedTrack.nonEmpty)
+    ProposalConfiguration.ALL.filter(p => p.impliedSelectedTrack.nonEmpty)
   }
 
   def getHTMLClassFor(pt: ProposalType): String = {
-    ConferenceDescriptor.ConferenceProposalConfigurations.ALL.filter(p => p.id == pt.id).map(_.htmlClass).headOption.getOrElse("unknown")
+    ProposalConfiguration.ALL.filter(p => p.id == pt.id).map(_.htmlClass).headOption.getOrElse("unknown")
   }
 
   def isChosablePreferredDaysProposals(pt: ProposalType): Boolean = {
-    ConferenceDescriptor.ConferenceProposalConfigurations.ALL.filter(p => p.id == pt.id).map(_.chosablePreferredDay).headOption.getOrElse(false)
+    ProposalConfiguration.ALL.filter(p => p.id == pt.id).map(_.chosablePreferredDay).headOption.getOrElse(false)
   }
 
   def doesProposalTypeGiveSpeakerFreeEntrance(pt: ProposalType): Boolean = {
-    ConferenceDescriptor.ConferenceProposalConfigurations.ALL.filter(p => p.id == pt.id).map(_.givesSpeakerFreeEntrance).headOption.getOrElse(false)
+    ProposalConfiguration.ALL.filter(p => p.id == pt.id).map(_.givesSpeakerFreeEntrance).headOption.getOrElse(false)
   }
 
   def doesProposalTypeAllowOtherSpeaker(pt: ProposalType): Boolean = {
-    ConferenceDescriptor.ConferenceProposalConfigurations.ALL.filter(p => p.id == pt.id).map(_.allowOtherSpeaker).headOption.getOrElse(true)
+    ProposalConfiguration.ALL.filter(p => p.id == pt.id).map(_.allowOtherSpeaker).headOption.getOrElse(true)
+  }
+
+  def doesItGivesSpeakerFreeEntrance(pt: ProposalType): Boolean = {
+    ALL.filter(_.id == pt.id).exists(_.givesSpeakerFreeEntrance)
+  }
+
+  def accessibleTypeToGoldenTicketReviews(pt: ProposalType): Boolean = {
+    ALL.filter(_.id == pt.id).exists(_.accessibleTypeToGoldenTicketReviews())
   }
 }
 
@@ -151,31 +178,7 @@ object ConferenceDescriptor {
 
   // TODO Configure here the slot, with the number of slots available, if it gives a free ticket to the speaker, some CSS icons
   object ConferenceProposalConfigurations {
-    val CONF = ProposalConfiguration(id = "conf", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.CONF.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-bullhorn",
-      chosablePreferredDay = true, accessibleTypeToGoldenTicketReviews = () => true)
-    val UNI = ProposalConfiguration(id = "uni", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.UNI.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-laptop",
-      chosablePreferredDay = false, accessibleTypeToGoldenTicketReviews = () => true)
-    val TIA = ProposalConfiguration(id = "tia", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.TIA.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-tools",
-      chosablePreferredDay = true, accessibleTypeToGoldenTicketReviews = () => true)
-    val LAB = ProposalConfiguration(id = "lab", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.LAB.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-flask",
-      chosablePreferredDay = true, accessibleTypeToGoldenTicketReviews = () => true)
-    val QUICK = ProposalConfiguration(id = "quick", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.QUICK.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = true, htmlClass = "fas fa-fast-forward",
-      chosablePreferredDay = true, allowOtherSpeaker = false, accessibleTypeToGoldenTicketReviews = () => true)
-    val BOF = ProposalConfiguration(id = "bof", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.BOF.id)), givesSpeakerFreeEntrance = false, freeEntranceDisplayed = false, htmlClass = "fas fa-users",
-      chosablePreferredDay = false, accessibleTypeToGoldenTicketReviews = () => ConferenceDescriptor.isCFPOpen)
-    val KEY = ProposalConfiguration(id = "key", slotsCount = ConferenceSlots.all.count(_.name.equals(ConferenceProposalTypes.KEY.id)), givesSpeakerFreeEntrance = true, freeEntranceDisplayed = false, htmlClass = "fas fa-microphone",
-      chosablePreferredDay = true, accessibleTypeToGoldenTicketReviews = () => false)
-    val OTHER = ProposalConfiguration(id = "other", slotsCount = 1, givesSpeakerFreeEntrance = false, freeEntranceDisplayed = false, htmlClass = "fas fa-microphone-alt",
-      hiddenInCombo = true, chosablePreferredDay = false, accessibleTypeToGoldenTicketReviews = () => false)
 
-    val ALL = List(CONF, UNI, TIA, LAB, QUICK, BOF, KEY, OTHER)
-
-    def doesItGivesSpeakerFreeEntrance(proposalType: ProposalType): Boolean = {
-      ALL.filter(_.id == proposalType.id).exists(_.givesSpeakerFreeEntrance)
-    }
-    def accessibleTypeToGoldenTicketReviews(proposalType: ProposalType): Boolean = {
-      ALL.filter(_.id == proposalType.id).exists(_.accessibleTypeToGoldenTicketReviews())
-    }
   }
 
   // TODO Configure here your Conference's tracks.

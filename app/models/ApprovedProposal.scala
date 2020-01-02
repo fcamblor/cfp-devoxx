@@ -37,14 +37,14 @@ object ApprovedProposal {
   }
 
   val getTotal: Map[String, Int] = Map(
-    ("conf.label", ConferenceProposalConfigurations.CONF.slotsCount)
-    , ("uni.label", ConferenceProposalConfigurations.UNI.slotsCount)
-    , ("tia.label", ConferenceProposalConfigurations.TIA.slotsCount)
-    , ("lab.label", ConferenceProposalConfigurations.LAB.slotsCount)
-    , ("quick.label", ConferenceProposalConfigurations.QUICK.slotsCount)
-    , ("bof.label", ConferenceProposalConfigurations.BOF.slotsCount)
-    , ("key.label", ConferenceProposalConfigurations.KEY.slotsCount)
-    , ("other.label", ConferenceProposalConfigurations.OTHER.slotsCount)
+    ("conf.label", ProposalConfiguration.CONF.slotsCount)
+    , ("uni.label", ProposalConfiguration.UNI.slotsCount)
+    , ("tia.label", ProposalConfiguration.TIA.slotsCount)
+    , ("lab.label", ProposalConfiguration.LAB.slotsCount)
+    , ("quick.label", ProposalConfiguration.QUICK.slotsCount)
+    , ("bof.label", ProposalConfiguration.BOF.slotsCount)
+    , ("key.label", ProposalConfiguration.KEY.slotsCount)
+    , ("other.label", ProposalConfiguration.OTHER.slotsCount)
   )
 
   def countApproved(talkType: String): Long = Redis.pool.withClient {
@@ -134,7 +134,7 @@ object ApprovedProposal {
   // The bug was that a conference is approved, but then the speaker changes the
   // format to quickie, then the Approved:conf collection is not updated correctly
   def _loadApprovedCategoriesForTalk(proposal: Proposal): List[String] = {
-    ConferenceDescriptor.ConferenceProposalConfigurations.ALL.filter { pc =>
+    ProposalConfiguration.ALL.filter { pc =>
       isApproved(proposal.id, pc.id)
     }.map(_.id)
   }
@@ -361,7 +361,7 @@ object ApprovedProposal {
           val speakerUUID = key.substring("ApprovedSpeakers:".length)
           for (speaker <- Speaker.findByUUID(speakerUUID)) yield {
             (speaker,
-              Proposal.loadAndParseProposals(client.smembers(key)).values.filter(p => ConferenceDescriptor.ConferenceProposalConfigurations.doesItGivesSpeakerFreeEntrance(p.talkType))
+              Proposal.loadAndParseProposals(client.smembers(key)).values.filter(p => ProposalConfiguration.doesItGivesSpeakerFreeEntrance(p.talkType))
               )
           }
       }
